@@ -1,9 +1,12 @@
 import pika
+from datetime import datetime
 
-EXCHANGE_NAME='ping_exchange'
-QUEUE_NAME='ping'
+EXCHANGE_NAME = 'ping_exchange'
+QUEUE_NAME = 'ping'
+
 
 def create_channel(exchange):
+    print('connect start', datetime.now())
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(
             host='host.docker.internal',
@@ -11,28 +14,26 @@ def create_channel(exchange):
             credentials=pika.PlainCredentials('guest', 'guest')
         ))
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange, exchange_type='topic')
-    print("channel created", exchange)
+    print("channel created", exchange, datetime.now())
     return channel
 
 
-def send_message(channel, exchange, routing_key, body):
+def send_message(exchange, routing_key, body):
+    channel = create_channel(exchange)
+
     channel.basic_publish(exchange=exchange,
                           routing_key=routing_key,
                           body=body)
     print(exchange, routing_key, body)
+    channel.close()
 
 
-def consume_messages(channel, exchange, queue, callback):
-    result = channel.queue_declare(queue, exclusive=True)
-    queue_name = result.method.queue
-    channel.queue_bind(
-        exchange=exchange, queue=queue_name, routing_key=queue_name)
-    channel.basic_consume(queue=queue_name,
+def consume_messages(exchange, queue, callback):
+    channel = create_channel(exchange)
+
+    channel.basic_consume(queue=queue,
                           auto_ack=True,
                           on_message_callback=callback)
 
     channel.start_consuming()
-
-
-ping_channel = create_channel(EXCHANGE_NAME)
+    channel.close()

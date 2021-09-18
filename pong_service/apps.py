@@ -1,6 +1,6 @@
 from pong_service.message_interceptor import consume_callback
 from django.apps import AppConfig
-from shared.utils.queue_utils import EXCHANGE_NAME, QUEUE_NAME, consume_messages, ping_channel
+from shared.utils.queue_utils import EXCHANGE_NAME, QUEUE_NAME, consume_messages
 
 
 class PongServiceConfig(AppConfig):
@@ -9,6 +9,6 @@ class PongServiceConfig(AppConfig):
 
     def __init__(self, *args, **kwargs):
         print('pong_service init')
-        consume_messages(ping_channel, EXCHANGE_NAME,
+        consume_messages(EXCHANGE_NAME,
                          QUEUE_NAME, consume_callback)
         super().__init__(*args, **kwargs)

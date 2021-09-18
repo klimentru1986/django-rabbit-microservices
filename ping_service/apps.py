@@ -1,4 +1,3 @@
-from shared.utils.queue_utils import ping_channel
 from django.apps import AppConfig
 
 
