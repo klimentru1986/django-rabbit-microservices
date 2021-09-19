@@ -16,7 +16,8 @@ import environ
 
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False)
+    DEBUG=(bool, False),
+    SERVICE_NAME=(str, 'ping_service')
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

@@ -1,3 +1,6 @@
 
-def consume_callback(ch, method, properties, body):
-    print(body)
+from kafka.consumer.fetcher import ConsumerRecord
+
+
+def consume_callback(msg: ConsumerRecord):
+    print(msg.value)

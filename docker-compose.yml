@@ -21,9 +21,42 @@ services:
     ports:
       - 8001:8000
 
+
+  pong_service_2:
+    image: drfmicro
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      - SERVICE_NAME=pong_service
+    ports:
+      - 8002:8000
+
   pp_rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: "pp_rabbitmq"
     ports:
       - 5672:5672
       - 15672:15672
+
+  zookeeper:
+    image: "bitnami/zookeeper:latest"
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: "bitnami/kafka:latest"
+    ports:
+      - "9093:9093"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_TLS_CLIENT_AUTH=none
+    depends_on:
+      - zookeeper
